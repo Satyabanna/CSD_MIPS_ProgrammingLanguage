@@ -734,7 +734,7 @@ The OOP syntax is designed to be a natural extension of KIK’s core style. It m
 
 ## 15.2. Feature Specification
 
-### 12.2.1. Classes and Objects
+### 15.2.1. Classes and Objects
 
 A class is a blueprint for creating objects. The class definition begins with the `class` keyword, followed by the class name, KIK's signature colon (`:`), and a body enclosed in curly braces (`{}`). A semicolon is required after the closing brace.
 
@@ -746,7 +746,7 @@ class MyClass: {
 };
 ```
 
-### 12.2.2. Access Modifiers
+### 15.2.2. Access Modifiers
 
 KIK supports encapsulation through access modifiers. Members are grouped into `public` and `private` sections, which are introduced by the keyword followed by a colon.
 
@@ -767,7 +767,7 @@ public:
 };
 ```
 
-### 12.2.3. Inheritance
+### 15.2.3. Inheritance
 
 Inheritance allows a new class (derived class) to inherit properties and methods from an existing class (base class). KIK uses the standard C++ syntax for public inheritance.
 
@@ -786,7 +786,7 @@ public:
 };
 ```
 
-### 12.2.4. Polymorphism
+### 15.2.4. Polymorphism
 
 Polymorphism allows objects of different classes to be treated as objects of a common base class. This is achieved through virtual functions.
 
@@ -809,7 +809,7 @@ public:
 };
 ```
 
-## 12.3. Grammar Rule Additions (EBNF)
+## 15.3. Grammar Rule Additions (EBNF)
 
 The following rules should be added to the main KIK grammar to support OOP features.
 
@@ -833,11 +833,11 @@ The following rules should be added to the main KIK grammar to support OOP featu
                        | <type> <var-list> ";" ;
 ```
 
-## 12.4. Complete Example
+## 15.4. Complete Example
 
 This program demonstrates all the newly designed OOP features working together.
 
-```kik
+```cpp=
 // Base class with a virtual function
 class Character: {
 public:
@@ -885,6 +885,7 @@ int kik() {
     return 0;
 }
 ```
+
 
 
 
@@ -1127,3 +1128,23 @@ We are learning it
 
 ##  Plan for Editor Development
 we are planning for it 
+
+## Work Division & Schedule (3 Weeks)
+
+| Date        | Member      | Module / Task                                | Details |
+|-------------|-------------|----------------------------------------------|---------|
+| Aug 18 - Aug 24 | Satya       | Module 1: Basic Syntax & Data Types          | Define basic syntax and data types,  keywords (int, float, char, bool, str, void, constant,return). Implement parser support. |
+| Aug 18 - Aug 24 | Guru Rohith | Module 1: Iterative & Control Structures     | Implement loops, conditionals, and flow control keywords.(if, else, switch, case, default,while, do, for,break, continue) |
+| Aug 18 - Aug 24 | Aman        | Module 1: Function Basics and expression, statement and identifiers and dynamic allocation. | Define function declaration/return rules, syntax rules for simple function,and dynamic memory allocation using new/delete. |
+| Aug 25 - Aug 31 | Satya       | Module 2: Pointers                           | Design pointer syntax, references. |
+| Aug 25 - Aug 31 | Guru Rohith | Module 2: OOP (Classes & Objects)            | Implement classes, access modifiers, inheritance, and polymorphism. |
+| Aug 25 - Aug 31 | Aman        | Module 2: Extended Functions & Scope Rules & pass by reference, and handled exception. | Extend functions with overloading , multiple parameters, reference passing, scope, and namespaces. |
+| Sep 1 - Sep 7   | Satya       | Module 3: File Operations                    | Implement fopen, fclose, fread, fwrite. |
+| Sep 1 - Sep 7   | Guru Rohith | Module 3: Arrays & Structures                | Design syntax for single and multi-dimensional arrays, structures. |
+| Sep 1 - Sep 7   | Aman        | Module 3: Implemented Recursion and type casting . Exception handling. | Give sample recursion code and implicit as well as explicit type casting syntax, description. |
+
+
+
+
+
+
