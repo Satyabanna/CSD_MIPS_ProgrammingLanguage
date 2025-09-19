@@ -24,7 +24,7 @@ Notes: The main function returns an integer (e.g., `return 0;`). Additional func
 KIK supports primitive types (`int`, `float`, `char`, `bool`) and strings (via `str` or `char` arrays). Booleans use `true` or `false`.
 
 ```ebnf
-<type> ::= "int" | "float" | "char" | "bool" | "str" | "void"
+<type> ::= "int" | "float" | "double" | "char" | "bool" | "str" | "void"
 <array-type> ::= "char" <identifier> "[" <integer-literal> "]"
 <boolean-literal> ::= "true" | "false"
 ```
@@ -361,7 +361,84 @@ int kik() {
 ```
 
 
-## 10.  Type Casting
+## 10. ENUM
+
+### Declaration rule 
+
+ ```cpp=
+<declaration> ::= <var_declaration> | <const_declaration> | <class_definition> | <struct_definition> | <enum_definition> ;
+```
+### Rules
+```cpp=
+<enum_definition> ::= "enum" <identifier> ":" "{" <enum_constants> "}" ";" ;
+<enum_constants> ::= <identifier> { "," <identifier> }* ;
+```
+### <type> Rule
+    
+```cpp=
+    <type> ::= "int" | "float" | "double" | "char" | "bool" | "str" | "void" | <identifier> ;
+```
+        
+        
+### Example of ENUM in kik 
+        
+```cpp=
+   import "io.kik";
+
+// Define an enum for days of the week
+enum Day: {
+    Sunday,
+    Monday,
+    Tuesday,
+    Wednesday,
+    Thursday,
+    Friday,
+    Saturday
+};
+
+int kik() {
+    // Declare a variable of the 'Day' enum type
+    Day today;
+    
+    // Assign a constant value to the enum variable
+    today = Wednesday;
+
+    // Use a switch-case statement to check the enum value
+    switch today: {
+        case Sunday: {
+            cout << "Today is Sunday." << endl;
+        }
+        case Monday: {
+            cout << "Today is Monday." << endl;
+        }
+        case Tuesday: {
+            cout << "Today is Tuesday." << endl;
+        }
+        case Wednesday: {
+            cout << "Today is Wednesday." << endl;
+        }
+        case Thursday: {
+            cout << "Today is Thursday." << endl;
+        }
+        case Friday: {
+            cout << "Today is Friday." << endl;
+        }
+        case Saturday: {
+            cout << "Today is Saturday." << endl;
+        }
+        default: {
+            cout << "Unknown day." << endl;
+        }
+    }
+
+    // You can also use the enum value in a calculation or print it directly.
+    // The enum value will be treated as its underlying integer type.
+    cout << "The numeric value of 'Wednesday' is: " << Wednesday << endl; // Outputs: 3
+
+    return 0; // Indicate successful execution
+}
+```
+## 11.  Type Casting
 
 Type casting in KIK allows conversion between compatible data types (e.g., int, float, char, bool, str). KIK supports both implicit and explicit type casting, enabling flexible data manipulation while maintaining type safety.
 
@@ -403,7 +480,7 @@ int kik() {
 }
 ```
 
-## 11. Exception Handling
+## 12. Exception Handling
 Exception handling in KIK provides a mechanism to manage runtime errors gracefully using try, catch, and throw constructs, ensuring robust program execution.
 
 * Syntax:
@@ -443,7 +520,7 @@ int kik() {
     return 0;  ## Indicate successful execution
 }
 ```
-### 12. Dynamic Memory Allocation 
+### 13. Dynamic Memory Allocation 
 
 Dynamic memory allocation in KIK allows runtime allocation and deallocation of memory using new and delete, supporting both single variables and arrays.
 
@@ -484,7 +561,7 @@ int kik() {
 }
 ```
 
-## 13. Files
+## 14. Files
 
 File pointer 
 ```cpp=
@@ -886,9 +963,337 @@ int kik() {
 }
 ```
 
+# 16. Memory Optimization
 
+This section details the memory optimization features and best practices for the KIK language. A core design principle of KIK is to provide programmers with control over performance, and effective memory management is a key aspect of this. The features are designed to be powerful and explicit, drawing from the C++ heritage of manual and automated resource management.
 
+### 16.1. Design and Purpose
 
+The design of KIK's memory management features balances flexibility with safety. While the language provides direct control over dynamic memory via pointers and `new`/`delete` operators, it also introduces higher-level constructs like constructors and destructors to enable robust, automated cleanup. This allows programmers to choose the appropriate strategy—from fast, automatic stack allocation for local variables to flexible heap allocation for long-lived objects—while providing tools to prevent common errors like memory leaks.
+
+### 16.2. Feature Specification
+
+#### 16.2.1. Memory Allocation Models: Stack and Heap
+
+KIK utilizes two primary memory regions for data storage: the **stack** and the **heap**.
+
+* **Stack Allocation**: Memory for variables declared within a function's scope is allocated on the stack. This process is automatic and extremely fast. The memory is valid only for the lifetime of the function and is automatically released when the function returns. The stack should be the default choice for primitive types and small, function-local objects.
+    ```kik
+    int kik() {
+        // 'stack_var' is allocated on the stack.
+        int stack_var = 10;
+        return 0; // 'stack_var' is automatically deallocated here.
+    }
+    ```
+
+* **Heap Allocation**: Memory allocated with the `new` keyword resides on the heap, a region of memory available for dynamic, long-term storage. This memory remains allocated until it is explicitly freed using `delete` or `delete[]`. Heap allocation is essential for data that must outlive the scope in which it was created but requires careful manual management.
+    ```kik
+    int kik() {
+        // 'heap_ptr' points to an integer allocated on the heap.
+        int$ heap_ptr: new int;
+        *heap_ptr = 20;
+
+        // Memory must be manually freed to avoid a leak.
+        delete heap_ptr;
+        return 0;
+    }
+    ```
+
+#### 16.2.2. Automatic Resource Management: Constructors and Destructors
+
+To greatly simplify heap memory management and prevent leaks, KIK classes support constructors and destructors. This enables the powerful **RAII (Resource Acquisition Is Initialization)** pattern, where a resource's lifetime is bound to the scope of an object.
+
+* A **constructor** is a special method invoked when an object is created, typically used to acquire resources like memory.
+* A **destructor**, prefixed with a tilde (`~`), is a special method invoked just before an object is destroyed. It is the ideal place to release any resources the object acquired.
+
+#### 16.2.3. Grammar Rule Additions (EBNF)
+
+To integrate constructors and destructors, the `<class_member>` and `<member_declaration>` rules are updated:
+
+```ebnf
+// A declaration can now also be a class definition.
+<declaration> ::= <var_declaration> | <const_declaration> | <class_definition> ;
+
+// Update class_member to include member_declaration
+<class_member> ::= <access_specifier> | <member_declaration> ;
+
+// Update member_declaration to include constructor and destructor rules
+<member_declaration> ::= [ "virtual" ] <type> <identifier> "(" [ <parameter-list> ] ")" [ "override" ] ";"
+                       | <type> <var-list> ";"
+                       | <constructor_declaration>
+                       | <destructor_declaration> ;
+
+// Rule for a constructor, which has the same name as the class
+<constructor_declaration> ::= <identifier> "(" [ <parameter-list> ] ")" ":" "{" <statement>* "}" ;
+
+// Rule for a destructor
+<destructor_declaration> ::= "~" <identifier> "(" ")" ":" "{" <statement>* "}" ;
+```
+
+#### 16.2.4. Complete Example: RAII for Safe Memory Management
+
+This sample program demonstrates how a class can use a constructor and destructor to safely manage a dynamic array, ensuring memory is always freed correctly.
+
+```
+/*
+ * KIK Language - Automatic Memory Management Test Case
+ * This program defines a 'MemorySafeArray' class that uses a
+ * constructor to allocate memory and a destructor to free it,
+ * demonstrating the RAII pattern.
+ */
+
+class MemorySafeArray: {
+private:
+    int$ data_ptr;
+    int array_size;
+
+public:
+    // Constructor: Acquires memory when the object is created.
+    MemorySafeArray(int size): {
+        array_size = size;
+        data_ptr: new int[array_size];
+        output("Array allocated on the heap.");
+    }
+
+    // Destructor: Releases memory when the object is destroyed.
+    ~MemorySafeArray(): {
+        delete[] data_ptr;
+        output("Array deallocated automatically. No memory leak!");
+    }
+};
+
+// Main program entry point
+int kik() {
+    output("--- KIK RAII Demo ---");
+
+    // 1. Create an object. Its constructor is called automatically.
+    MemorySafeArray myArray(25);
+
+    // ... perform operations with myArray ...
+    
+    // 2. When kik() finishes, 'myArray' goes out of scope.
+    // Its destructor is called automatically, freeing the memory.
+    return 0;
+}
+```
+
+### 16.2.5. Pass-by-Reference for Efficiency
+
+Passing large data structures (like `structs` or `classes`) to functions can be inefficient if done by value, as it requires creating a complete copy of the object. KIK supports pass-by-reference, which is a critical tool for memory optimization. Instead of copying the entire object, pass-by-reference sends only the object's memory address to the function.
+
+Key Benefits:
+
+Reduces Memory Usage: Avoids creating temporary, duplicate objects on the stack.
+
+Improves Performance: Prevents the CPU overhead of copying large amounts of data.
+
+Example: Optimizing Function Calls
+Inefficient (Pass-by-Value): A full copy of `bigStruct` is created every time `processData` is called.
+
+```
+struct DataSet: {
+    // Assume this struct contains a large amount of data
+    int data[1000];
+};
+
+void processData(DataSet ds): {
+    // 'ds' is a copy of the original struct.
+    // ...
+}
+```
+
+Only a memory address is passed, making the call fast and memory-friendly.
+
+```
+struct DataSet: {
+    int data[1000];
+};
+
+void processData(DataSet& ds): {
+    // 'ds' is a reference to the original struct, not a copy.
+    // ...
+}
+```
+
+# 17.Arrays and Multi-dimensional Arrays
+    
+This section details the specification for arrays in the KIK language. Arrays are a fundamental data structure for storing a fixed-size, sequential collection of elements of the same type. This feature is essential for a wide range of programming tasks, from simple data collection to complex algorithms.
+    
+### 17.1. Design Philosophy
+    
+The design of arrays in KIK is heavily inspired by their implementation in C/C++, ensuring consistency with the rest of the language's C-family heritage. However, the declaration syntax is updated to a more modern style.
+
+* Modern Declaration: The array's size is logically grouped with the type (e.g., int[10]) rather than the variable name.
+ 
+* Static Sizing: The size of an array must be a constant integer expression known at compile time.
+
+* Zero-Based Indexing: The first element of an array is at index 0.
+ 
+* Performance: KIK does not perform automatic runtime bounds checking. Accessing an array out of its defined bounds will lead to undefined behavior
+    
+### 17.2. Single-Dimensional Arrays
+    
+An array is declared by specifying the type of its elements, its size within square brackets [], and then the variable name.
+    
+#### Syntax
+    
+```
+type[SIZE] array_name;
+```
+
+#### Example 
+    
+```
+// Declares an array of 10 integers
+int[10] scores;
+
+// Declares an array of 50 floating-point numbers
+float[50] temperatures;
+```
+### Initialization
+Arrays can be initialized at the time of declaration using an initializer list enclosed in curly braces {}.
+    
+#### Syntax:
+```
+type[SIZE] array_name = { value1, value2, ... };
+```
+
+#### Examples:
+```
+// A fully initialized array
+int[5] numbers = {10, 20, 30, 40, 50};
+
+// A partially initialized array where the rest are default (0)
+int[5] scores = {95, 88};
+```
+#### Element Access
+Individual elements of an array are accessed using the subscript operator [] with the element's index.
+
+#### Syntax:
+```
+array_name[index]
+```
+#### Example:
+```
+int[5] numbers = {10, 20, 30, 40, 50};
+
+// Assign a new value to the first element
+numbers[0] = 100;
+
+// Read the third element
+int third_number = numbers[2]; // will be 30
+```
+    
+## 17.3.Multi-dimensional Arrays
+
+Multi-dimensional arrays are "arrays of arrays" and are useful for representing grids or matrices.
+
+### Declaration:
+A multi-dimensional array is declared by providing multiple size specifiers
+    
+#### Syntax:
+```
+type[SIZE1][SIZE2]... array_name;
+```
+#### Example:
+```
+// Declares a 2D array (a 3x4 matrix) of integers
+int[3][4] matrix;
+```
+    
+### Initialization
+Multi-dimensional arrays can be initialized using nested initializer lists.
+
+#### Example:
+```
+// Initializes a 2x3 matrix
+int[2][3] matrix = {
+    {1, 2, 3},  // Row 0
+    {4, 5, 6}   // Row 1
+};
+```
+### Element Access
+Elements are accessed by providing an index for each dimension.
+
+#### Example:
+``` 
+// Accesses the element in row 1, column 2 (value is 6)
+int val = matrix[1][2];
+```
+    
+### Grammar Additions (EBNF)
+The following rules should be integrated into the main KIK grammar.
+
+```
+// 1. Modify the <type> rule to include the array specifier.
+// The size is now part of the type definition itself.
+<type> ::= <base_type> [ <array_specifier> ] { "*" | "&" } ;
+
+// 2. Add a rule for the array specifier.
+// This allows for one or more dimensions.
+<array_specifier> ::= "[" <expression> "]" { "[" <expression> "]" }* ;
+
+// 3. The <var-init> rule is now simpler, as the array part is handled by the type.
+<var-init> ::= <identifier> [ "=" <initializer> ] ;
+
+// 4. The rule for an initializer list.
+<initializer> ::= "{" <expression> { "," <expression> }* "}" ;
+
+// 5. The rule for array element access.
+<array-access> ::= <identifier> "[" <expression> "]" { "[" <expression> "]" }* ;
+```   
+    
+
+#### Test Case 1: Single-Dimensional Array
+
+```
+// Purpose: Test single-dimensional arrays with the new KIK declaration syntax.
+// Expected Output:
+// Array elements: 5 10 15 20 25 
+// Element at index 2 is now: 99
+
+int kik() {
+    int[5] my_array = {5, 10, 15, 20, 25};
+
+    output("Array elements: ");
+    for (int i = 0; i < 5; i = i + 1): {
+        output(my_array[i]);
+        output(" ");
+    }
+
+    // Modify an element
+    my_array[2] = 99;
+    
+    output("\nElement at index 2 is now: ");
+    output(my_array[2]);
+
+    return 0;
+}    
+                          
+```    
+#### Test Case 2: Multi-dimensional Array
+```
+// Purpose: Test 2D arrays (matrices) with the new KIK declaration syntax.
+// Expected Output:
+// Matrix:
+// 1 2 3 
+// 4 5 6 
+
+int kik() {
+    int[2][3] matrix = { {1, 2, 3}, {4, 5, 6} };
+
+    output("Matrix:\n");
+    for (int i = 0; i < 2; i = i + 1): {
+        for (int j = 0; j < 3; j = j + 1): {
+            output(matrix[i][j]);
+            output(" ");
+        }
+        output("\n");
+    }
+
+    return 0;
+}                          
+```                          
 ## Test Cases for KIK Language Compiler
 ### Test Case 1: Basic Syntax and Control Structures (basic_syntax.kik)
 
@@ -1141,7 +1546,7 @@ we are planning for it
 | Aug 25 - Aug 31 | Aman        | Module 2: Extended Functions & Scope Rules & pass by reference, and handled exception. | Extend functions with overloading , multiple parameters, reference passing, scope, and namespaces. |
 | Sep 1 - Sep 7   | Satya       | Module 3: File Operations                    | Implement fopen, fclose, fread, fwrite. |
 | Sep 1 - Sep 7   | Guru Rohith | Module 3: Arrays & Structures                | Design syntax for single and multi-dimensional arrays, structures. |
-| Sep 1 - Sep 7   | Aman        | Module 3: Implemented Recursion and type casting . Exception handling. | Give sample recursion code and implicit as well as explicit type casting syntax, description. |
+| Sep 1 - Sep 7   | Aman        | Module 3: Implemented Recursion and type casting . Exception handling. | Add ENUM functionality and give sample recursion code and implicit as well as explicit type casting syntax, description. |
 
 
 
