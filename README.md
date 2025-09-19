@@ -520,46 +520,6 @@ int kik() {
     return 0;  ## Indicate successful execution
 }
 ```
-### 13. Dynamic Memory Allocation 
-
-Dynamic memory allocation in KIK allows runtime allocation and deallocation of memory using new and delete, supporting both single variables and arrays.
-
-* Syntax:
-
-```ebnf=
-<dynamic-memory-statement> ::= <type> "$" <identifier> ":" "new" <type> [ "[" <expression> "]" ] ";" 
-                             | "delete" <identifier> ";" 
-                             | "delete[]" <identifier> ";"
-```
-* Description:
-  * Declaration: Pointers are declared with a $ symbol (e.g., int$ ptr;).
-  * Allocation:
-    * new dataType; allocates memory for a single variable (e.g., int$ ptr: new int;).
-    * new dataType[size]; allocates memory for an array (e.g., int$ arr: new int[5];).
-  * Deallocation:
-     * delete ptr; frees memory for a single variable.
-    * delete[] arr; frees memory for an array
- * Dereference: Use *ptr to access or modify the value at the pointer's address (e.g., *ptr = 42; or value = *ptr;).
-* Use Case: Enables flexible memory management for variables and arrays whose size is determined at runtime, such as dynamic arrays or objects.
-
-* Semantics: Memory allocated with new resides on the heap and must be explicitly deallocated with delete or delete[] to prevent memory leaks. Accessing a pointer after deletion or dereferencing a null pointer causes runtime errors.
-
-
-```kik=
-## dynamic_memory.kik - Simple Dynamic Memory Allocation
-int kik() {
-    int$ ptr: new int;     ## Allocate memory for a single integer
-    *ptr = 15;             ## Assign value
-    cout << "Value: " << *ptr << endl;  ## Outputs: Value: 15
-    delete ptr;            ## Deallocate memory
-    
-    int$ array: new int[3];  ## Allocate memory for an array
-    array[0] = 1; array[1] = 2; array[2] = 3;  ## Assign values
-    cout << "Array: " << array[0] << " " << array[1] << " " << array[2] << endl;  ## Outputs: Array: 1 2 3
-    delete[] array;        ## Deallocate array
-    return 0;              ## Indicate successful execution
-}
-```
 
 ## 13. Files
 
@@ -1293,7 +1253,47 @@ int kik() {
 
     return 0;
 }                          
-```                          
+```
+# 18. Dynamic Memory Allocation 
+
+Dynamic memory allocation in KIK allows runtime allocation and deallocation of memory using new and delete, supporting both single variables and arrays.
+
+* Syntax:
+
+```ebnf=
+<dynamic-memory-statement> ::= <type> "$" <identifier> ":" "new" <type> [ "[" <expression> "]" ] ";" 
+                             | "delete" <identifier> ";" 
+                             | "delete[]" <identifier> ";"
+```
+* Description:
+  * Declaration: Pointers are declared with a $ symbol (e.g., int$ ptr;).
+  * Allocation:
+    * new dataType; allocates memory for a single variable (e.g., int$ ptr: new int;).
+    * new dataType[size]; allocates memory for an array (e.g., int$ arr: new int[5];).
+  * Deallocation:
+     * delete ptr; frees memory for a single variable.
+    * delete[] arr; frees memory for an array
+ * Dereference: Use *ptr to access or modify the value at the pointer's address (e.g., *ptr = 42; or value = *ptr;).
+* Use Case: Enables flexible memory management for variables and arrays whose size is determined at runtime, such as dynamic arrays or objects.
+
+* Semantics: Memory allocated with new resides on the heap and must be explicitly deallocated with delete or delete[] to prevent memory leaks. Accessing a pointer after deletion or dereferencing a null pointer causes runtime errors.
+
+
+```kik=
+## dynamic_memory.kik - Simple Dynamic Memory Allocation
+int kik() {
+    int$ ptr: new int;     ## Allocate memory for a single integer
+    *ptr = 15;             ## Assign value
+    cout << "Value: " << *ptr << endl;  ## Outputs: Value: 15
+    delete ptr;            ## Deallocate memory
+    
+    int$ array: new int[3];  ## Allocate memory for an array
+    array[0] = 1; array[1] = 2; array[2] = 3;  ## Assign values
+    cout << "Array: " << array[0] << " " << array[1] << " " << array[2] << endl;  ## Outputs: Array: 1 2 3
+    delete[] array;        ## Deallocate array
+    return 0;              ## Indicate successful execution
+}
+```                         
 ## Test Cases for KIK Language Compiler
 ### Test Case 1: Basic Syntax and Control Structures (basic_syntax.kik)
 
