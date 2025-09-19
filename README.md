@@ -520,6 +520,9 @@ int kik() {
     return 0;  ## Indicate successful execution
 }
 ```
+    
+    
+
 
 ## 13. Files
 
@@ -1253,7 +1256,9 @@ int kik() {
 
     return 0;
 }                          
-```
+``` 
+                              
+                              
 # 18. Dynamic Memory Allocation 
 
 Dynamic memory allocation in KIK allows runtime allocation and deallocation of memory using new and delete, supporting both single variables and arrays.
@@ -1293,7 +1298,7 @@ int kik() {
     delete[] array;        ## Deallocate array
     return 0;              ## Indicate successful execution
 }
-```                         
+```                              
 ## Test Cases for KIK Language Compiler
 ### Test Case 1: Basic Syntax and Control Structures (basic_syntax.kik)
 
@@ -1551,7 +1556,10 @@ we are planning for it
 
 
 
-
+          
+                                                    
+                                                    
+                                                    
 # KIK Language Test Cases
 ### Test Case 1: Conditional Logic (if-else if-else)
 This test demonstrates the use of an if-else if-else block to determine a grade based on a score.
@@ -1795,8 +1803,7 @@ int kik() {
 output("The product is: ");
 output(multiply(3, 4));
 return 0;
-}                                                  
-```
-
+}
+```    
 
 
