@@ -561,7 +561,7 @@ int kik() {
 }
 ```
 
-## 14. Files
+## 13. Files
 
 File pointer 
 ```cpp=
