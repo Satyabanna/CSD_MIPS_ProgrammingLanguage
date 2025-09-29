@@ -1222,7 +1222,7 @@ int kik() {
     int[5] my_array = {5, 10, 15, 20, 25};
 
     output("Array elements: ");
-    for (int i = 0; i < 5; i = i + 1): {
+    for (int i = 0; i < 5;: i = i + 1): {
         output(my_array[i]);
         output(" ");
     }
@@ -1249,8 +1249,8 @@ int kik() {
     int[2][3] matrix = { {1, 2, 3}, {4, 5, 6} };
 
     output("Matrix:\n");
-    for (int i = 0; i < 2; i = i + 1): {
-        for (int j = 0; j < 3; j = j + 1): {
+    for (int i = 0; i < 2;: i = i + 1): {
+        for (int j = 0; j < 3;: j = j + 1): {
             output(matrix[i][j]);
             output(" ");
         }
@@ -1322,7 +1322,7 @@ int kik() {
     }
     
     // Loop structures
-    for int i = 0; i < 5; i++: {
+    for int i = 0; i < 5;: i++: {
         cout << "Loop iteration: " << i << endl;
     }
     
