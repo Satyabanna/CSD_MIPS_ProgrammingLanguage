@@ -323,6 +323,34 @@ int kik() {
 }
 ```
 
+
+## Sample code --> factorial.kik - KIK Program to Calculate Factorial of a Number
+
+```
+import "io.kik";
+
+int kik() {
+int factorial = 1;
+output("Enter a positive integer: ");
+number = input();
+## Convert string input to integer (assuming input is valid)
+int num = 0;
+for int i = 0; i < number.length(); i++: {
+num = num * 10 + (number[i] - '0');
+}
+if num < 0: {
+cout << "Error: Please enter a non-negative number!" << endl;
+return 1;
+}
+## Calculate factorial using a loop
+for int i = 1; i <= num; i++: {
+factorial *= i;
+}
+cout << "Factorial of " << num << " is " << factorial << endl;
+return 0;
+}
+```
+
 ## 9. Recursion
 
 Sample code for factorial calculation using recursion
