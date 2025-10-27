@@ -1,0 +1,193 @@
+/*
+ * KIK Editor v1.0
+ * A vi-like text editor written entirely in the KIK language.
+ * Filename: kik_edit.kik
+ *
+ * This program demonstrates classes, pointers, loops,
+ * conditionals, and the system call interface.
+ */
+
+// Import all the necessary standard libraries
+import "io.kik";
+import "string.kik";
+import "file.kik";
+import "system.kik";
+
+// --- Global Constants & Data Structures ---
+constant int MODE_NORMAL = 0;
+constant int MODE_INSERT = 1;
+constant int MODE_COMMAND = 2;
+
+// The main class to hold the editor's state.
+// This translates the C++ struct into a KIK class.
+class EditorState: {
+public:
+    int cx, cy;             // Cursor X and Y
+    int screen_rows;
+    int screen_cols;
+    int row_offset;         // Vertical scroll
+    str[1000] lines;        // File content buffer (fixed size)
+    int num_lines;          // Number of lines currently in use
+    int mode;
+    str status_msg;
+    str filename;
+    bool dirty;
+};
+
+// Global instance of the editor state
+EditorState E;
+
+// --- Function Prototypes (KIK-style) ---
+void editorOpen(str fname);
+void editorSave();
+str editorPrompt(str prompt);
+void editorRefreshScreen();
+void editorProcessKeypress();
+void editorDrawRows();
+void editorDrawStatusBar();
+void editorMoveCursor(char key);
+void initEditor();
+
+// --- Main Program Entry Point ---
+int kik() {
+    enableRawMode();
+    initEditor();
+   
+    // This is the editor's main loop
+    while (true): {
+        editorRefreshScreen();
+        editorProcessKeypress();
+    }
+
+    return 0;
+}
+
+// --- Initialization ---
+void initEditor() {
+    E.cx = 0;
+    E.cy = 0;
+    E.row_offset = 0;
+    E.num_lines = 1;
+    E.lines[0] = ""; // Start with one blank line
+    E.mode = MODE_NORMAL;
+    E.status_msg = "HELP: :q = quit | :w = save";
+    E.filename = "[No Name]";
+    E.dirty = false;
+   
+    // Use pointers to get window size from system call
+    getWindowSize(&E.screen_rows, &E.screen_cols);
+    E.screen_rows = E.screen_rows - 2; // Reserve space for status bars
+}
+
+// --- Screen Drawing ---
+void editorRefreshScreen() {
+    // KIK does not have string buffers, so we use system calls
+    hideCursor();
+    clearScreen();
+    moveCursor(0, 0);
+
+    editorDrawRows();
+    editorDrawStatusBar();
+
+    // Move cursor to its real position
+    moveCursor(E.cy - E.row_offset, E.cx);
+    showCursor();
+}
+
+void editorDrawRows() {
+    for int y = 0; y < E.screen_rows; y = y + 1: {
+        int file_row = y + E.row_offset;
+        if (file_row >= E.num_lines): {
+            output("~");
+        } else: {
+            // KIK string library will need a substring function
+            // For now, we output the whole line
+            output(E.lines[file_row]);
+        }
+        output("\r\n"); // Carriage return and newline
+    }
+}
+
+void editorDrawStatusBar() {
+    str mode_str;
+    if (E.mode == MODE_NORMAL): {
+        mode_str = " NORMAL ";
+    } else if (E.mode == MODE_INSERT): {
+        mode_str = " INSERT ";
+    } else: {
+        mode_str = " COMMAND ";
+    }
+   
+    str status = E.filename;
+    if (E.dirty): {
+        status = status + " [Modified]";
+    }
+   
+    // KIK string library needs int_to_str()
+    // We'll output a simplified bar for now
+    output(mode_str + status);
+}
+
+// --- Input Handling ---
+void editorProcessKeypress() {
+    char c = readKey();
+
+    if (E.mode == MODE_INSERT): {
+        if (c == 27): { // ASCII for Escape key
+            E.mode = MODE_NORMAL;
+        } else: {
+            // Placeholder for inserting characters
+            E.dirty = true;
+        }
+    } else if (E.mode == MODE_NORMAL): {
+        if (c == 'i'): {
+            E.mode = MODE_INSERT;
+            E.status_msg = "INSERT MODE";
+        } else if (c == 'h' or c == 'j' or c == 'k' or c == 'l'): {
+            editorMoveCursor(c);
+        } else if (c == ':'): {
+            str cmd = editorPrompt(":");
+            if (cmd == "q"): {
+                if (E.dirty): {
+                    E.status_msg = "Unsaved changes! Use :q! to force quit.";
+                } else: {
+                    clearScreen();
+                    exit(0);
+                }
+            } else if (cmd == "q!"): {
+                clearScreen();
+                exit(0);
+            } else if (cmd == "w"): {
+                // editorSave(); // Not fully implemented
+                E.status_msg = "File saved (Not Implemented).";
+                E.dirty = false;
+            }
+        }
+    }
+}
+
+void editorMoveCursor(char key) {
+    if (key == 'h'): {
+        if (E.cx > 0): { E.cx = E.cx - 1; }
+    } else if (key == 'l'): {
+        if (E.cx < E.screen_cols - 1): { E.cx = E.cx + 1; }
+    } else if (key == 'k'): {
+        if (E.cy > 0): { E.cy = E.cy - 1; }
+    } else if (key == 'j'): {
+        if (E.cy < E.num_lines - 1): { E.cy = E.cy + 1; }
+    }
+}
+
+str editorPrompt(str prompt) {
+    E.mode = MODE_COMMAND;
+    E.status_msg = prompt;
+    editorRefreshScreen(); // Show the prompt
+
+    // This is a simplified input for now
+    // A real implementation would read key by key
+    str cmd = input();
+   
+    E.mode = NORMAL;
+    E.status_msg = "";
+    return cmd;
+}
