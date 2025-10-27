@@ -1,0 +1,15 @@
+// KIK Standard Library: File Bindings
+// Filename: file.kik
+
+// This is an "opaque type" provided by the OS via the compiler.
+// It represents an open file.
+type filePointer;
+
+/*
+ * System Call declarations for file operations.
+ */
+
+filePointer fopen(str filename, str mode);
+void fclose(filePointer f);
+void fwrite(filePointer f, str data, int size, int count);
+void fread(filePointer f, char* buffer, int size, int count);

@@ -1,0 +1,22 @@
+// KIK Standard Library: I/O Bindings
+// Filename: io.kik
+
+/*
+ * These are declarations for System Calls provided by the OS.
+ * The compiler knows how to link these to the OS functions.
+ */
+
+// Prints a string to the console
+void output(str message);
+
+// Reads a line of text from the console
+str input();
+
+/*
+ * This is a pure KIK helper function. It uses other
+ * library functions to provide more features.
+ */
+void println(str message) {
+    output(message);
+    output("\n");
+}

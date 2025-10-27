@@ -1,0 +1,22 @@
+import "io.kik";
+import "math.kik";
+import "string.kik";
+
+int kik() {
+    println("--- Testing KIK Standard Library with Imports ---"); // From io.kik
+
+    // Test 1: Math Library
+    println("\nTesting math.kik...");
+    int larger_num = max(100, 42); // From math.kik
+    output("The max of 100 and 42 is: ");
+    output(larger_num);
+
+    // Test 2: String Library
+    println("\n\nTesting string.kik...");
+    int len = strlen("KIK Language"); // From string.kik
+    output("The length of 'KIK Language' is: ");
+    output(len);
+
+    println("\n\n--- Library Tests Complete ---");
+    return 0;
+}

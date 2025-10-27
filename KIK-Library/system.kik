@@ -1,0 +1,32 @@
+// KIK Standard Library: System & Terminal Control
+// Filename: system.kik
+
+/*
+ * System Call declarations for terminal control.
+ * These are required by the vi-like editor.
+ */
+
+// Puts the terminal into raw, non-canonical mode.
+void enableRawMode();
+
+// Reads a single raw character from the keyboard.
+char readKey();
+
+// Gets the current width and height of the terminal.
+// It uses pointers to "return" two values.
+void getWindowSize(int* rows, int* cols);
+
+// Clears the entire terminal screen.
+void clearScreen();
+
+// Moves the hardware cursor to a specific row and column.
+void moveCursor(int row, int col);
+
+// Hides the cursor.
+void hideCursor();
+
+// Shows the cursor.
+void showCursor();
+
+// Exits the program with a status code.
+void exit(int code);
