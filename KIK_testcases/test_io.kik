@@ -1,0 +1,6 @@
+import "io.kik";
+
+int kik() {
+    output("Test 1 PASS: I/O OK");
+    return 0;
+}

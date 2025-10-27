@@ -1,0 +1,13 @@
+import "io.kik";
+
+// Function definition
+int add(int a, int b): {
+    return a + b;
+}
+
+int kik() {
+    int result = add(10, 5);
+    output("Test 2 Result: ");
+    output(result);
+    return 0;
+}

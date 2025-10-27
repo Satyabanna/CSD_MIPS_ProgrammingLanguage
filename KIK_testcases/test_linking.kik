@@ -1,0 +1,9 @@
+import "io.kik";
+import "my_math_lib.kik";  // Tests importing a user-defined file
+
+int kik() {
+    int result = multiply(7, 3);
+    output("Test 3 Result: ");
+    output(result);
+    return 0;
+}
